@@ -4,75 +4,67 @@ const REDIS_HOST = process.env.REDIS_HOST || "localhost";
 const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 export class RedisRepository {
-  private client: RedisClientType;
+  private static client: RedisClientType = createClient({
+    url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
+  });
 
-  constructor() {
-    this.client = createClient({
-      url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
-    });
-
-    this.client.on("error", (err) => {
+  static {
+    RedisRepository.client.on("error", (err) => {
       console.error("Redis Client Error", err);
     });
   }
 
-  private async connect(): Promise<void> {
-    await this.client.connect();
+  constructor() {
+    this.connect();
   }
 
-  private async disconnect(): Promise<void> {
-    await this.client.quit();
+  private async connect(): Promise<void> {
+    if (!RedisRepository.client.isOpen) {
+      await RedisRepository.client.connect();
+    }
+  }
+
+  public static async disconnect(): Promise<void> {
+    if (RedisRepository.client.isOpen) {
+      await RedisRepository.client.quit();
+    }
   }
 
   get = async (key: string): Promise<any[] | null> => {
     try {
-      await this.connect();
-
-      const fullList = await this.client.get(key);
+      const fullList = await RedisRepository.client.get(key);
 
       if (!fullList) {
         return null;
       }
 
-      const data = JSON.parse(fullList);
-
-      return data;
+      return JSON.parse(fullList);
     } catch (error) {
       console.error("Error fetching list range:", error);
 
       throw error;
-    } finally {
-      await this.disconnect();
     }
   };
 
   set = async <T>(key: string, value: T, ttl: number = 3600): Promise<void> => {
     try {
-      await this.connect();
-
-      await this.client.set(key, JSON.stringify(value), {
+      await RedisRepository.client.set(key, JSON.stringify(value), {
         EX: ttl,
       });
     } catch (error) {
       console.error("Error setting value in Redis:", error);
 
       throw error;
-    } finally {
-      await this.disconnect();
     }
   };
 
   flushAll = async (): Promise<void> => {
     try {
-      await this.connect();
-
-      await this.client.flushAll();
+      await RedisRepository.client.flushAll();
     } catch (error) {
       console.error("Error flushing Redis:", error);
 
       throw error;
-    } finally {
-      await this.disconnect();
     }
   };
 }

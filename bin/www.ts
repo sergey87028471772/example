@@ -7,6 +7,7 @@ import debugLib from "debug";
 import { AddressInfo } from "net";
 
 import { app } from "../src/0_app";
+import { RedisRepository } from "../src/5_infrastructure";
 
 const debug = debugLib("backend:server");
 
@@ -21,6 +22,9 @@ server.setTimeout(1000 * 60 * 30);
 
 server.on("error", onError);
 server.on("listening", onListening);
+
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
 
 function normalizePort(value: string): number | false {
   const port = Number(value);
@@ -53,4 +57,12 @@ function onListening(): void {
   const bind = `port ${addr?.port}`;
 
   debug(`Listening on ${bind}`);
+}
+
+async function cleanup() {
+  console.log("Cleaning up before exiting...");
+
+  await RedisRepository.disconnect();
+
+  process.exit(0);
 }
