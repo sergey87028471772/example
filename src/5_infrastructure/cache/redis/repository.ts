@@ -67,4 +67,14 @@ export class RedisRepository {
       throw error;
     }
   };
+
+  delete = async (key: string): Promise<void> => {
+    try {
+      await RedisRepository.client.del(key);
+    } catch (error) {
+      console.error("Error deleting value from Redis:", error);
+
+      throw error;
+    }
+  };
 }
