@@ -1,0 +1,1 @@
+export { getSkinportData } from "./read";

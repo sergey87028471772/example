@@ -1,0 +1,1 @@
+export { KnexRepository } from "./knexRepository";

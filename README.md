@@ -1,0 +1,2 @@
+- knex migrate:latest --knexfile ./src/5_infrastructure/db/postgre/config/knexConfig.ts
+- sudo docker compose -f postgres-redis.dev.yml up

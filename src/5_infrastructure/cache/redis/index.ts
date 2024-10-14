@@ -1,0 +1,1 @@
+export { RedisRepository } from "./repository";
