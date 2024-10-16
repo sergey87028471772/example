@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 
-import { knex } from "./client";
+import { knex, errorHandler } from "./client";
 
 export class KnexRepository {
   private tableName: string;
@@ -12,11 +12,13 @@ export class KnexRepository {
   }
 
   async getRows(limit: number, offset: number) {
-    return await knex(this.tableName)
-      .select()
-      .orderBy("market_hash_name")
-      .limit(limit)
-      .offset(offset);
+    return await errorHandler(
+      knex(this.tableName)
+        .select()
+        .orderBy("market_hash_name")
+        .limit(limit)
+        .offset(offset)
+    );
   }
 
   async insertMany<T>(items: T[], batchSize: number = 1000) {
@@ -26,61 +28,61 @@ export class KnexRepository {
       batches.push(items.slice(i, i + batchSize));
     }
 
-    await knex.transaction(async (trx) => {
-      for (const batch of batches) {
-        await trx(this.tableName)
-          .insert(batch)
-          .onConflict("market_hash_name")
-          .merge();
-      }
-    });
+    await errorHandler(
+      knex.transaction(async (trx) => {
+        for (const batch of batches) {
+          await trx(this.tableName)
+            .insert(batch)
+            .onConflict("market_hash_name")
+            .merge();
+        }
+      })
+    );
   }
 
   async findUser(userName: string) {
-    return await knex(this.tableName).where({ user_name: userName }).first();
+    return await errorHandler(
+      knex(this.tableName).where({ user_name: userName }).first()
+    );
   }
 
   async createUser(userName: string) {
-    const [result] = await knex(this.tableName)
-      .insert({ user_name: userName, balance: 1000 })
-      .returning(["id", "balance"]);
-
-    return result;
+    return await errorHandler(
+      knex(this.tableName)
+        .insert({ user_name: userName, balance: 1000 })
+        .returning(["id", "balance"])
+    );
   }
 
-  async findItem(marketHashName: string) {
-    return await knex(this.tableName)
-      .where({ market_hash_name: marketHashName })
-      .first();
+  async findItem(itemId: string) {
+    return await errorHandler(
+      knex(this.tableName).where({ id: itemId }).first()
+    );
   }
 
   async createPurchase(userId: string, trx: Knex.Transaction) {
-    const [result] = await trx(this.tableName)
+    return await trx(this.tableName)
       .insert({ user_id: userId })
       .returning("id");
-
-    return result;
   }
 
   async addPurchaseItem(
     purchaseId: string,
-    marketHashName: string,
+    itemId: string,
     trx: Knex.Transaction
   ) {
     await trx(this.tableName).insert({
       purchase_id: purchaseId,
-      item_market_hash_name: marketHashName,
+      item_id: itemId,
     });
   }
 
   async updateItemQuantity(
-    marketHashName: string,
+    itemId: string,
     quantity: number,
     trx: Knex.Transaction
   ) {
-    return await trx(this.tableName)
-      .where({ market_hash_name: marketHashName })
-      .update({ quantity });
+    return await trx(this.tableName).where({ id: itemId }).update({ quantity });
   }
 
   async updateUserBalance(

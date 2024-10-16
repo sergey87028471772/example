@@ -1,7 +1,6 @@
 import { KnexRepository } from "~5_infrastructure";
 
 import { PurchaseItem } from "../../entities";
-import { error } from "console";
 
 export const buyItems = async (
   userId: string,
@@ -14,31 +13,35 @@ export const buyItems = async (
   const purchasesRepository = new KnexRepository("purchases");
   const purchaseItemsRepository = new KnexRepository("purchase_items");
 
-  await KnexRepository.client.transaction(async (trx) => {
-    const purchase = await purchasesRepository.createPurchase(userId, trx);
+  const result = await KnexRepository.client
+    .transaction(async (trx) => {
+      const purchase = await purchasesRepository.createPurchase(userId, trx);
 
-    for (const purchaseItem of purchaseItems) {
-      const { marketHashName } = purchaseItem;
+      for (const purchaseItem of purchaseItems) {
+        const { id: itemId } = purchaseItem;
 
-      await purchaseItemsRepository.addPurchaseItem(
-        purchase.id,
-        marketHashName,
-        trx
-      );
+        await purchaseItemsRepository.addPurchaseItem(
+          purchase[0].id,
+          itemId,
+          trx
+        );
 
-      const newQuantity = purchaseItem.quantity - purchaseItem.count;
+        const newQuantity = purchaseItem.quantity - purchaseItem.count;
 
-      await itemsRepository.updateItemQuantity(
-        marketHashName,
-        newQuantity,
-        trx
-      );
+        await itemsRepository.updateItemQuantity(itemId, newQuantity, trx);
 
-      const newBalance = userBalance - totalPrice;
+        const newBalance = userBalance - totalPrice;
 
-      await userRepository.updateUserBalance(userId, newBalance, trx);
-    }
-  });
+        await userRepository.updateUserBalance(userId, newBalance, trx);
+      }
 
-  return "Покупка зарегистрирована";
+      return "Покупка зарегистрирована";
+    })
+    .catch((err) => {
+      console.error(err);
+
+      return "Ошибка при регистрации покупки";
+    });
+
+  return result;
 };

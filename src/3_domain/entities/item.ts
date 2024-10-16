@@ -1,4 +1,5 @@
 export type Item = {
+  id: string;
   marketHashName: string;
   currency: string;
   suggestedPrice: number;

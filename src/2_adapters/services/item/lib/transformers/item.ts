@@ -9,7 +9,7 @@ export const enrichItem = async (
   itemsRepository: KnexRepository
 ): Promise<boolean> => {
   for (const purchaseItem of purchaseItems) {
-    const item = await itemsRepository.findItem(purchaseItem.marketHashName);
+    const item = await itemsRepository.findItem(purchaseItem.id);
 
     if (!item) {
       return false;

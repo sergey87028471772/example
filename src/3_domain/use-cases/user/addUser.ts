@@ -8,7 +8,9 @@ export const addUser = async (userName: string): Promise<User> => {
   const user = await userRepository.findUser(userName);
 
   if (!user) {
-    return await userRepository.createUser(userName);
+    const newUser = await userRepository.createUser(userName);
+
+    return newUser[0];
   }
 
   return user;

@@ -1,3 +1,3 @@
-import knex from "./knexClient";
+import knex, { errorHandler } from "./knexClient";
 
-export { knex };
+export { knex, errorHandler };

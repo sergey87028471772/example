@@ -8,7 +8,7 @@ const getItemsSchema = Joi.object({
 });
 
 const purchaseItemSchema = Joi.object({
-  marketHashName: Joi.string().required(),
+  id: Joi.string().required(),
   count: Joi.number().integer().min(0).required(),
 });
 

@@ -1,5 +1,5 @@
 export type PurchaseItem = {
-  marketHashName: string;
+  id: string;
   count: number;
   suggestedPrice: number;
   quantity: number;
