@@ -29,6 +29,7 @@
     "@jest/globals": "^29.7.0",
     "@types/debug": "^4.1.12",
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.13",
     "@types/knex": "^0.16.1",
     "@types/node": "^22.7.5",
     "@types/redis": "^4.0.11",

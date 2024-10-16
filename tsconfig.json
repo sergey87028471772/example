@@ -17,6 +17,6 @@
       "~5_infrastructure": ["./5_infrastructure"]
     }
   },
-  "include": ["src/**/*.ts", "bin/*"],
+  "include": ["src", "__tests__", "types.d.ts"],
   "exclude": ["node_modules"]
 }
