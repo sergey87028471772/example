@@ -69,11 +69,13 @@ export class KnexRepository {
   async addPurchaseItem(
     purchaseId: string,
     itemId: string,
+    count: number,
     trx: Knex.Transaction
   ) {
     await trx(this.tableName).insert({
       purchase_id: purchaseId,
       item_id: itemId,
+      count,
     });
   }
 

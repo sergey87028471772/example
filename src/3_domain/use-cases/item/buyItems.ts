@@ -23,6 +23,7 @@ export const buyItems = async (
         await purchaseItemsRepository.addPurchaseItem(
           purchase[0].id,
           itemId,
+          purchaseItem.count,
           trx
         );
 

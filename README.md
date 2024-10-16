@@ -20,12 +20,12 @@ body: {
   "userName": "admin",
   "purchaseItems": [
     {
-      "marketHashName": "10 Year Birthday Sticker Capsule",
-      "count": 11
+        "id": "752c6ad8-59d0-4120-884b-3daaadfb8063",
+        "count": 1
     },
     {
-      "marketHashName": "1st Lieutenant Farlow | SWAT",
-      "count": 1
+        "id": "9c5ae71a-24a5-4ed6-bfc7-132cca9c6c2c",
+        "count": 2
     }
   ]
 }
