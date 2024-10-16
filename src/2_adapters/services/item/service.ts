@@ -11,7 +11,7 @@ import { snakeToCamel } from "~4_lib";
 
 import { KnexRepository } from "~5_infrastructure";
 
-import { isLowBalance, isWrongCount } from "./lib";
+import { isLowBalance, isWrongCount, enrichItem, getTotalPrice } from "./lib";
 
 export class ItemService {
   setItems = async (): Promise<string> => {
@@ -31,18 +31,13 @@ export class ItemService {
 
     const { id: userId, balance: userBalance } = await addUser(userName);
 
-    let totalPrice = 0;
+    const isEnriched = await enrichItem(purchaseItems, itemsRepository);
 
-    for (const purchaseItem of purchaseItems) {
-      const item = snakeToCamel(
-        await itemsRepository.findItem(purchaseItem.marketHashName)
-      ) as Item;
-
-      purchaseItem.suggestedPrice = item.suggestedPrice;
-      purchaseItem.quantity = item.quantity;
-
-      totalPrice += purchaseItem.count * (purchaseItem.suggestedPrice ?? 0);
+    if (!isEnriched) {
+      return "Одного из товаров нет в базе";
     }
+
+    const totalPrice = getTotalPrice(purchaseItems);
 
     if (isLowBalance(totalPrice, userBalance)) {
       return "Не хватает средств на балансе";

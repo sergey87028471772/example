@@ -1,8 +1,8 @@
-export const isWrongCount = <T extends { quantity?: number; count: number }>(
-  purchaseItems: T[]
-): boolean => {
+import { PurchaseItem } from "~3_domain";
+
+export const isWrongCount = (purchaseItems: PurchaseItem[]): boolean => {
   for (const item of purchaseItems) {
-    if (item.count > (item.quantity ?? 0)) {
+    if (item.count > item.quantity) {
       return true;
     }
   }

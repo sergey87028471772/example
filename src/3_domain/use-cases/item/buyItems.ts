@@ -1,6 +1,7 @@
 import { KnexRepository } from "~5_infrastructure";
 
 import { PurchaseItem } from "../../entities";
+import { error } from "console";
 
 export const buyItems = async (
   userId: string,
@@ -25,7 +26,7 @@ export const buyItems = async (
         trx
       );
 
-      const newQuantity = (purchaseItem.quantity ?? 0) - purchaseItem.count;
+      const newQuantity = purchaseItem.quantity - purchaseItem.count;
 
       await itemsRepository.updateItemQuantity(
         marketHashName,
