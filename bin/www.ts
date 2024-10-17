@@ -9,6 +9,17 @@ import { AddressInfo } from "net";
 import { app } from "../src/0_app";
 import { RedisRepository } from "../src/5_infrastructure";
 
+process.on("SIGINT", cleanup);
+process.on("SIGTERM", cleanup);
+
+process.on("uncaughtException", async (error) => {
+  console.error("WARNING UNCAUGHT ERROR:: Uncaught Exception:", error);
+});
+
+process.on("unhandledRejection", async (reason) => {
+  console.error("WARNING UNCAUGHT ERROR: Unhandled Rejection:", reason);
+});
+
 const debug = debugLib("backend:server");
 
 const port = normalizePort(process.env.PORT || "3001");
@@ -22,9 +33,6 @@ server.setTimeout(1000 * 60 * 30);
 
 server.on("error", onError);
 server.on("listening", onListening);
-
-process.on("SIGINT", cleanup);
-process.on("SIGTERM", cleanup);
 
 function normalizePort(value: string): number | false {
   const port = Number(value);
